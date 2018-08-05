@@ -15,6 +15,8 @@ class ManagerWindow(QMainWindow):
         # 标签页设置
         self.tabs = QTabWidget()
         self.tabs.setTabsClosable(True)
+        # 设置标签页关闭
+        self.tabs.tabCloseRequested.connect(self.close_tab)
         self.tree = QTreeWidget()
         self.tree.setColumnCount(1)
         self.tree.setHeaderLabel('数据库')
@@ -74,19 +76,19 @@ class ManagerWindow(QMainWindow):
         # 设置字号
         font = QFont('SansSerif', 10)
         frame.setFont(font)
-
+        
         self.set_show_label(frame)
         self.set_key_value(frame)
         self.set_show_btn(frame)
         self.set_show_data(frame)
         self.tabs.addTab(frame, tab_name)
 
-    def close_tab(self):
+    def close_tab(self, index):
         '''
         关闭标签页
         '''
-        index = self.tabs.currentIndex()
-        self.tabs.removeTab(index)
+        if index > -1:
+            self.tabs.removeTab(index)
 
     def set_show_btn(self, frame):
         '''
