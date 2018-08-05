@@ -4,13 +4,22 @@
 import sys
 
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QCoreApplication
 
 class ManagerWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.setFixedSize(1000, 700)
+        # 标签页设置
+        self.tabs = QTabWidget()
+        self.tabs.setTabsClosable(True)
+        self.tree = QTreeWidget()
+        self.tree.setColumnCount(1)
+        self.tree.setHeaderLabel('数据库')
+        self.tree.setMaximumWidth(200)
+
         self.init_UI()
 
     def init_UI(self):
@@ -23,7 +32,7 @@ class ManagerWindow(QMainWindow):
         self.center()
         self.setWindowTitle("Redis Manager")
 
-        self.set_statusbar('ready')
+        # self.set_statusbar('ready')
 
         #设置icon
         # self.setWindowIcon(QIcon('./icon/redis.png'))
@@ -38,30 +47,120 @@ class ManagerWindow(QMainWindow):
         layout = QHBoxLayout()
         widget.setLayout(layout)
 
-        layout.addWidget(self.get_show_tree())
+        self.set_show_tree()
+        for index in range(10):
+            self.create_tab('str' + str(index))
 
-        frame = QFrame()
-    
-        layout.addWidget(frame)
+        layout.addWidget(self.tree)
+        layout.addWidget(self.tabs)
 
         self.setCentralWidget(widget)
 
-    def get_show_tree(self):
+    def create_tab(self, tab_name):
         '''
-        设置左侧树
+        创建标签页
         '''
-        tree = QTreeWidget()
-        tree.setColumnCount(1)
-        tree.setHeaderLabel('数据库')
-        tree.setMaximumWidth(200)
-        root = QTreeWidgetItem(tree)
+        frame = QFrame() 
+        
+        # grid = QGridLayout(frame)
+
+        # # 面板顶部按钮及显示数据
+        # top_layout = QHBoxLayout()
+        # top_layout.addStretch(1)
+        # top_layout.addWidget(QLabel('类型: '))
+        # QLabel('String')
+
+        # grid.addLayout(top_layout, 0, 0)
+        # 设置字号
+        font = QFont('SansSerif', 10)
+        frame.setFont(font)
+
+        self.set_show_label(frame)
+        self.set_key_value(frame)
+        self.set_show_btn(frame)
+        self.set_show_data(frame)
+        self.tabs.addTab(frame, tab_name)
+
+    def close_tab(self):
+        '''
+        关闭标签页
+        '''
+        index = self.tabs.currentIndex()
+        self.tabs.removeTab(index)
+
+    def set_show_btn(self, frame):
+        '''
+        设置展示面板的按钮
+        '''
+        # 设置TTL
+        ttl_btn = QPushButton('set TTL', frame).move(200, 5)
+        # 刷新数据
+        reload_btn = QPushButton('reload data', frame).move(300, 5)
+        # 删除
+        del_btn = QPushButton('delete', frame).move(400, 5)
+        # 设置值
+        reset_btn = QPushButton('set value', frame).move(600, 100)
+
+
+    def set_show_label(self, frame):
+        '''
+        设置展示的label
+        '''
+        # 使用绝对定位添加label
+        QLabel('type： ', frame).move(5, 10)
+        QLabel('String', frame).move(40, 10)
+        QLabel('TTL : ',frame).move(100, 10)
+        QLabel('-1', frame).move(140, 10)
+        QLabel('key： ', frame).move(5, 500)
+        QLabel('value: ', frame).move(5, 540)
+
+    def set_key_value(self, frame):
+        '''
+        设置键值显示框
+        '''
+        key_text = QLineEdit(frame)
+        key_text.move(50, 495)
+        key_text.setFixedWidth(500)
+
+        val_text = QTextEdit(frame)
+        val_text.move(50, 540)
+        val_text.setFixedWidth(500)
+        val_text.setFixedHeight(80)
+
+    def set_show_data(self, frame):
+        '''
+        设置展示数据的列表
+        '''
+        # 展示数据的Table
+        data_table = QTableWidget(10, 2, frame)
+        # 设置表头
+        data_table.setHorizontalHeaderLabels(['键', '值'])
+        data_table.move(5, 50)
+        data_table.setFixedWidth(560)
+        data_table.setFixedHeight(400)
+        # 禁止编辑
+        data_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # 整行选择
+        data_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # 设置单元格宽度，参数： （单元格索引， 宽度）
+        data_table.setColumnWidth(0, 267)
+        data_table.setColumnWidth(1, 267)
+
+        # 添加数据
+        for col in range(2):
+            for row in range(10):
+                data_table.setItem(row, col, QTableWidgetItem(str(col) +' : ' + str(row)))
+
+    def set_show_tree(self):
+        '''
+        设置左侧树组件
+        '''
+        root = QTreeWidgetItem(self.tree)
         root.setText(0, '连接-1')
         for i in range(10):
             item = QTreeWidgetItem(root)
             item.setText(0, str(i))
             root.addChild(item)
-
-        return tree
 
     def init_menubar(self):
         '''
@@ -69,7 +168,7 @@ class ManagerWindow(QMainWindow):
         '''
         menubar = self.menuBar()
 
-        menu = menubar.addMenu('&连接')
+        menu = menubar.addMenu('&connect')
         createConnAct = QAction('&新建连接', self)
         createConnAct.setToolTip('新建连接')
         createConnAct.setShortcut('Ctrl+N')
