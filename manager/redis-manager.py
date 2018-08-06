@@ -38,6 +38,20 @@ class MyRedis:
         r = self.get_redis(self, db=db)
         return r.pipeline()
 
+    def get_db_size(self):
+        '''
+        获取数据库数量
+        '''
+        r = self.get_redis()
+        return r.config_get('databases')
+
+    def get_db_keys(self):
+        '''
+        获取数据库的所有键
+        '''
+        r = self.get_redis()
+        return r.keys('*')
+
 
 def singleton(cls, *args, **kw):
     instances = {}
@@ -56,3 +70,6 @@ class redisUtli:
     def set(connect, key, value):
         connect.set(key, value)
 
+if __name__ == '__main__':
+    my_redis = MyRedis()
+    print(my_redis.get_db_keys())

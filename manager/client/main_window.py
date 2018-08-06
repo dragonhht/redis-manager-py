@@ -3,7 +3,7 @@
 
 import sys
 
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow, QTreeWidget, QWidget, QTabWidget, QHBoxLayout, QFrame, QPushButton, QLabel, QLineEdit, QTextEdit, QTableWidget, QAbstractItemView, QTableWidgetItem, QTreeWidgetItem, QAction, QMessageBox, QDesktopWidget, QApplication
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QCoreApplication
 
@@ -64,15 +64,6 @@ class ManagerWindow(QMainWindow):
         '''
         frame = QFrame() 
         
-        # grid = QGridLayout(frame)
-
-        # # 面板顶部按钮及显示数据
-        # top_layout = QHBoxLayout()
-        # top_layout.addStretch(1)
-        # top_layout.addWidget(QLabel('类型: '))
-        # QLabel('String')
-
-        # grid.addLayout(top_layout, 0, 0)
         # 设置字号
         font = QFont('SansSerif', 10)
         frame.setFont(font)
@@ -139,7 +130,7 @@ class ManagerWindow(QMainWindow):
         data_table.setHorizontalHeaderLabels(['键', '值'])
         data_table.move(5, 50)
         data_table.setFixedWidth(560)
-        data_table.setFixedHeight(400)
+        data_table.setFixedHeight(430)
         # 禁止编辑
         data_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         # 整行选择
