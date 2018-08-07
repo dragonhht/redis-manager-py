@@ -10,6 +10,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow, QTreeWidget, QWidget, QTabWidget, QHBoxLayout, QFrame, QPushButton, QLabel, QLineEdit, QTextEdit, QTableWidget, QAbstractItemView, QTableWidgetItem, QTreeWidgetItem, QAction, QMessageBox, QDesktopWidget, QApplication
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QCoreApplication
+import show_window
 
 class ManagerWindow(QMainWindow):
 
@@ -110,8 +111,8 @@ class ManagerWindow(QMainWindow):
         '''
         设置TTL按钮的点击事件
         '''
-        # TODO 设置TTL事件
-        pass
+        win = show_window.TTL(key)
+        win.exec_()
 
     def reload_data(self, key):
         '''
