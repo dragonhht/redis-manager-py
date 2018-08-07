@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*- 
 
+'''
+主窗体
+'''
+
 import sys
 
 from PyQt5.QtWidgets import QMainWindow, QTreeWidget, QWidget, QTabWidget, QHBoxLayout, QFrame, QPushButton, QLabel, QLineEdit, QTextEdit, QTableWidget, QAbstractItemView, QTableWidgetItem, QTreeWidgetItem, QAction, QMessageBox, QDesktopWidget, QApplication
@@ -86,14 +90,49 @@ class ManagerWindow(QMainWindow):
         设置展示面板的按钮
         '''
         # 设置TTL
-        ttl_btn = QPushButton('set TTL', frame).move(200, 5)
+        ttl_btn = QPushButton('set TTL', frame)
+        ttl_btn.move(200, 5)
+        ttl_btn.clicked.connect(self.set_TTL_btn)
         # 刷新数据
-        reload_btn = QPushButton('reload data', frame).move(300, 5)
+        reload_btn = QPushButton('reload data', frame)
+        reload_btn.move(300, 5)
+        reload_btn.clicked.connect(self.reload_data)
         # 删除
-        del_btn = QPushButton('delete', frame).move(400, 5)
+        del_btn = QPushButton('delete', frame)
+        del_btn.move(400, 5)
+        del_btn.clicked.connect(self.del_data)
         # 设置值
-        reset_btn = QPushButton('set value', frame).move(600, 100)
+        reset_btn = QPushButton('set value', frame)
+        reset_btn.move(600, 100)
+        reset_btn.clicked.connect(self.reset_data)
 
+    def set_TTL_btn(self, key):
+        '''
+        设置TTL按钮的点击事件
+        '''
+        # TODO 设置TTL事件
+        pass
+
+    def reload_data(self, key):
+        '''
+        刷新面板数据
+        '''
+        # TODO 刷新面板数据
+        pass
+
+    def del_data(self, key):
+        '''
+        删除数据
+        '''
+        # TODO 删除数据
+        pass
+
+    def reset_data(self, key):
+        '''
+        设置键的值
+        '''
+        # TODO 设置键的值
+        pass
 
     def set_show_label(self, frame):
         '''
