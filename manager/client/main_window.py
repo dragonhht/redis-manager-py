@@ -125,8 +125,12 @@ class ManagerWindow(QMainWindow):
         '''
         删除数据
         '''
-        # TODO 删除数据
-        pass
+        replay = QMessageBox.question(self, '提示', '是否删除该键', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if replay == QMessageBox.Yes:
+            # TODO 执行删除
+            print('执行删除操作')
+        else:
+            print('关闭')
 
     def reset_data(self, key):
         '''
