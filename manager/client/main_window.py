@@ -111,9 +111,9 @@ class ManagerWindow(QMainWindow):
         '''
         设置TTL按钮的点击事件
         '''
-        win = show_window.TTL(key)
+        win = show_window.TTL(key, 'TTL')
         win.exec_()
-
+        
     def reload_data(self, key):
         '''
         刷新面板数据
@@ -136,8 +136,8 @@ class ManagerWindow(QMainWindow):
         '''
         设置键的值
         '''
-        # TODO 设置键的值
-        pass
+        win = show_window.TTL(key, 'value')
+        win.exec_()
 
     def set_show_label(self, frame):
         '''
@@ -187,6 +187,8 @@ class ManagerWindow(QMainWindow):
         for col in range(2):
             for row in range(10):
                 data_table.setItem(row, col, QTableWidgetItem(str(col) +' : ' + str(row)))
+
+        data_table.currentItemChanged.connect()
 
     def set_show_tree(self):
         '''

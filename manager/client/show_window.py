@@ -12,9 +12,10 @@ from PyQt5.QtGui import QFont
 
 class TTL(QDialog):
 
-    def __init__(self, key):
+    def __init__(self, key, title):
         super().__init__()
         self.key = key
+        self.title = title
         self.setFixedSize(400, 130)
         self.init_UI()
         
@@ -24,7 +25,7 @@ class TTL(QDialog):
         '''
         self.init_UI_compont()
         self.center()
-        self.setWindowTitle('设置TTL')
+        self.setWindowTitle('设置' + self.title)
         self.show()
 
     def init_UI_compont(self):
@@ -36,7 +37,7 @@ class TTL(QDialog):
         layout = QVBoxLayout(self)
 
         input_hbox = QHBoxLayout()
-        label = QLabel('TTL: ')
+        label = QLabel(self.title + ': ')
         val_input = QLineEdit()
         val_input.setFixedWidth(200)
         val_input.setFixedHeight(25)
