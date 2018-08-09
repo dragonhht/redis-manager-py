@@ -67,17 +67,7 @@ class ManagerWindow(QMainWindow):
         '''
         创建标签页
         '''
-        frame = QFrame() 
-        
-        # 设置字号
-        font = QFont('SansSerif', 10)
-        frame.setFont(font)
-        
-        self.set_show_label(frame)
-        self.set_key_value(frame)
-        self.set_show_btn(frame)
-        self.set_show_data(frame)
-        self.tabs.addTab(frame, tab_name)
+        self.tabs.addTab(tab(), tab_name)
 
     def close_tab(self, index):
         '''
@@ -86,109 +76,6 @@ class ManagerWindow(QMainWindow):
         if index > -1:
             self.tabs.removeTab(index)
 
-    def set_show_btn(self, frame):
-        '''
-        设置展示面板的按钮
-        '''
-        # 设置TTL
-        ttl_btn = QPushButton('set TTL', frame)
-        ttl_btn.move(200, 5)
-        ttl_btn.clicked.connect(self.set_TTL_btn)
-        # 刷新数据
-        reload_btn = QPushButton('reload data', frame)
-        reload_btn.move(300, 5)
-        reload_btn.clicked.connect(self.reload_data)
-        # 删除
-        del_btn = QPushButton('delete', frame)
-        del_btn.move(400, 5)
-        del_btn.clicked.connect(self.del_data)
-        # 设置值
-        reset_btn = QPushButton('set value', frame)
-        reset_btn.move(600, 100)
-        reset_btn.clicked.connect(self.reset_data)
-
-    def set_TTL_btn(self, key):
-        '''
-        设置TTL按钮的点击事件
-        '''
-        win = show_window.TTL(key, 'TTL')
-        win.exec_()
-        
-    def reload_data(self, key):
-        '''
-        刷新面板数据
-        '''
-        # TODO 刷新面板数据
-        pass
-
-    def del_data(self, key):
-        '''
-        删除数据
-        '''
-        replay = QMessageBox.question(self, '提示', '是否删除该键', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if replay == QMessageBox.Yes:
-            # TODO 执行删除
-            print('执行删除操作')
-        else:
-            print('关闭')
-
-    def reset_data(self, key):
-        '''
-        设置键的值
-        '''
-        win = show_window.TTL(key, 'value')
-        win.exec_()
-
-    def set_show_label(self, frame):
-        '''
-        设置展示的label
-        '''
-        # 使用绝对定位添加label
-        QLabel('type： ', frame).move(5, 10)
-        QLabel('String', frame).move(40, 10)
-        QLabel('TTL : ',frame).move(100, 10)
-        QLabel('-1', frame).move(140, 10)
-        QLabel('key： ', frame).move(5, 500)
-        QLabel('value: ', frame).move(5, 540)
-
-    def set_key_value(self, frame):
-        '''
-        设置键值显示框
-        '''
-        key_text = QLineEdit(frame)
-        key_text.move(50, 495)
-        key_text.setFixedWidth(500)
-
-        val_text = QTextEdit(frame)
-        val_text.move(50, 540)
-        val_text.setFixedWidth(500)
-        val_text.setFixedHeight(80)
-
-    def set_show_data(self, frame):
-        '''
-        设置展示数据的列表
-        '''
-        # 展示数据的Table
-        data_table = QTableWidget(10, 2, frame)
-        # 设置表头
-        data_table.setHorizontalHeaderLabels(['键', '值'])
-        data_table.move(5, 50)
-        data_table.setFixedWidth(560)
-        data_table.setFixedHeight(430)
-        # 禁止编辑
-        data_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        # 整行选择
-        data_table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # 设置单元格宽度，参数： （单元格索引， 宽度）
-        data_table.setColumnWidth(0, 267)
-        data_table.setColumnWidth(1, 267)
-
-        # 添加数据
-        for col in range(2):
-            for row in range(10):
-                data_table.setItem(row, col, QTableWidgetItem(str(col) +' : ' + str(row)))
-
-        data_table.currentItemChanged.connect()
 
     def set_show_tree(self):
         '''
@@ -252,6 +139,148 @@ class ManagerWindow(QMainWindow):
         qr.moveCenter(cp)
         # 将创建的窗口移动
         self.move(qr.topLeft())
+
+class tab(QFrame):
+    '''
+    详细数据展示面板
+    '''
+
+    def __init__(self):
+        super().__init__()
+        # 设置字号
+        self.setFont(QFont('SansSerif', 10))
+        self.ttl_btn = QPushButton('set TTL', self)
+        self.reload_btn = QPushButton('reload data', self)
+        self.del_btn = QPushButton('delete', self)
+        self.reset_btn = QPushButton('set value', self)
+        self.key_text = QLineEdit(self)
+        self.val_text = QTextEdit(self)
+        self.data_table = None
+        # 选择的列表行索引
+        self.row_index = -1
+
+        self.init_UI()
+
+    def init_UI(self):
+        '''
+        初始化面板
+        '''
+        self.set_show_label()
+        self.set_key_value()
+        self.set_show_btn()
+        self.set_show_data()
+
+    def set_show_btn(self):
+        '''
+        设置展示面板的按钮
+        '''
+        # 设置TTL
+        self.ttl_btn.move(200, 5)
+        self.ttl_btn.clicked.connect(self.set_TTL_btn)
+        # 刷新数据
+        self.reload_btn.move(300, 5)
+        self.reload_btn.clicked.connect(self.reload_data)
+        # 删除
+        self.del_btn.move(400, 5)
+        self.del_btn.clicked.connect(self.del_data)
+        # 设置值
+        self.reset_btn.move(600, 100)
+        self.reset_btn.clicked.connect(self.reset_data)
+
+    def set_TTL_btn(self, key):
+        '''
+        设置TTL按钮的点击事件
+        '''
+        win = show_window.TTL(key, 'TTL')
+        win.exec_()
+        
+    def reload_data(self, key):
+        '''
+        刷新面板数据
+        '''
+        # TODO 刷新面板数据
+        pass
+
+    def del_data(self, key):
+        '''
+        删除数据
+        '''
+        msg = '是否删除该键'
+        if (self.row_index == -1):
+            msg = '请选择要删除的键'
+        replay = QMessageBox.question(self, '提示', msg, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if replay == QMessageBox.Yes:
+            # TODO 执行删除
+            self.data_table.removeRow(self.row_index)
+            self.row_index = -1
+            print('执行删除操作')
+
+    def reset_data(self, key):
+        '''
+        设置键的值
+        '''
+        win = show_window.TTL(key, 'value')
+        win.exec_()
+
+    def set_show_label(self):
+        '''
+        设置展示的label
+        '''
+        # 使用绝对定位添加label
+        QLabel('type： ', self).move(5, 10)
+        QLabel('String', self).move(40, 10)
+        QLabel('TTL : ',self).move(100, 10)
+        QLabel('-1', self).move(140, 10)
+        QLabel('key： ', self).move(5, 500)
+        QLabel('value: ', self).move(5, 540)
+
+    def set_key_value(self):
+        '''
+        设置键值显示框
+        '''
+        self.key_text.move(50, 495)
+        self.key_text.setFixedWidth(500)
+
+        self.val_text.move(50, 540)
+        self.val_text.setFixedWidth(500)
+        self.val_text.setFixedHeight(80)
+
+    def set_show_data(self):
+        '''
+        设置展示数据的列表
+        '''
+        # 展示数据的Table
+        self.data_table = QTableWidget(10, 2, self)
+        # 设置表头
+        self.data_table.setHorizontalHeaderLabels(['键', '值'])
+        self.data_table.move(5, 50)
+        self.data_table.setFixedWidth(560)
+        self.data_table.setFixedHeight(430)
+        # 禁止编辑
+        self.data_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # 整行选择
+        self.data_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # 设置单元格宽度，参数： （单元格索引， 宽度）
+        self.data_table.setColumnWidth(0, 267)
+        self.data_table.setColumnWidth(1, 267)
+
+        # 添加数据
+        for col in range(2):
+            for row in range(10):
+                self.data_table.setItem(row, col, QTableWidgetItem(str(col) +' : ' + str(row)))
+
+        self.data_table.currentItemChanged.connect(self.show_item_data)
+
+    def show_item_data(self, item):
+        '''
+        展示键值对数据
+        '''
+        index = self.data_table.currentRow()
+        self.row_index = index
+        key_item = self.data_table.item(index, 0)
+        val_item = self.data_table.item(index, 1)
+        self.key_text.setText(key_item.data(0))
+        self.val_text.setPlainText(val_item.data(0))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
