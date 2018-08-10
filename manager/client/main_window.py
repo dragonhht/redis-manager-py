@@ -7,7 +7,7 @@
 
 import sys
 
-from PyQt5.QtWidgets import QMainWindow, QTreeWidget, QWidget, QTabWidget, QHBoxLayout, QFrame, QPushButton, QLabel, QLineEdit, QTextEdit, QTableWidget, QAbstractItemView, QTableWidgetItem, QTreeWidgetItem, QAction, QMessageBox, QDesktopWidget, QApplication
+from PyQt5.QtWidgets import QMainWindow, QTreeView, QTreeWidget, QWidget, QTabWidget, QHBoxLayout, QFrame, QPushButton, QLabel, QLineEdit, QTextEdit, QTableWidget, QAbstractItemView, QTableWidgetItem, QTreeWidgetItem, QAction, QMessageBox, QDesktopWidget, QApplication
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QCoreApplication
 import show_window
@@ -65,6 +65,7 @@ class ManagerWindow(QMainWindow):
         layout.addWidget(self.tabs)
 
         self.setCentralWidget(widget)
+        self.tree.itemClicked.connect(self.test)
 
     def create_tab(self, tab_name):
         '''
@@ -88,10 +89,11 @@ class ManagerWindow(QMainWindow):
         for i in range(10):
             item = QTreeWidgetItem(root)
             item.setText(0, str(i))
+            
             root.addChild(item)
 
-    def test(self, item):
-        print(item)
+    def test(self, item, column):
+        print()
 
     def init_menubar(self):
         '''
