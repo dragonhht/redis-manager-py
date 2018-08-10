@@ -50,6 +50,7 @@ class TTL(QDialog):
         ok_btn = QPushButton()
         ok_btn.setText('确认')
         ok_btn.setFixedWidth(50)
+        ok_btn.clicked.connect(self.click_ok)
         cancle_btn = QPushButton()
         cancle_btn.setText('取消')
         cancle_btn.setFixedWidth(50)
@@ -62,6 +63,17 @@ class TTL(QDialog):
         layout.addLayout(hbox)
 
         # self.setCentralWidget(widget)
+    
+    def click_ok(self):
+        '''
+        确认按钮事件
+        '''
+        print(self.title)
+        if (self.title == 'TTL'):
+            print('正在设置TTL')
+        if (self.title == 'value'):
+            print('正在设置Value')
+        self.close()
 
     def center(self):
         '''
@@ -81,7 +93,7 @@ def show_TTL_win(key):
     显示TTL设置窗体
     '''
     app = QApplication(sys.argv)
-    win = TTL(key)
+    win = TTL(key, 'test')
     sys.exit(app.exec_())
 
 def main():

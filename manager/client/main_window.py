@@ -54,7 +54,10 @@ class ManagerWindow(QMainWindow):
         layout = QHBoxLayout()
         widget.setLayout(layout)
 
-        self.set_show_tree()
+        self.set_show_tree('链接-1')
+        self.set_show_tree('连接-2')
+        self.set_show_tree('连接-3')
+        self.set_show_tree('连接-4')
         for index in range(10):
             self.create_tab('str' + str(index))
 
@@ -76,17 +79,19 @@ class ManagerWindow(QMainWindow):
         if index > -1:
             self.tabs.removeTab(index)
 
-
-    def set_show_tree(self):
+    def set_show_tree(self, title):
         '''
         设置左侧树组件
         '''
         root = QTreeWidgetItem(self.tree)
-        root.setText(0, '连接-1')
+        root.setText(0, title)
         for i in range(10):
             item = QTreeWidgetItem(root)
             item.setText(0, str(i))
             root.addChild(item)
+
+    def test(self, item):
+        print(item)
 
     def init_menubar(self):
         '''
@@ -158,6 +163,7 @@ class tab(QFrame):
         self.data_table = None
         # 选择的列表行索引
         self.row_index = -1
+        self.key = None
 
         self.init_UI()
 
@@ -187,14 +193,14 @@ class tab(QFrame):
         self.reset_btn.move(600, 100)
         self.reset_btn.clicked.connect(self.reset_data)
 
-    def set_TTL_btn(self, key):
+    def set_TTL_btn(self):
         '''
         设置TTL按钮的点击事件
         '''
-        win = show_window.TTL(key, 'TTL')
+        win = show_window.TTL(self.key, 'TTL')
         win.exec_()
-        
-    def reload_data(self, key):
+
+    def reload_data(self):
         '''
         刷新面板数据
         '''
@@ -213,14 +219,20 @@ class tab(QFrame):
             # TODO 执行删除
             self.data_table.removeRow(self.row_index)
             self.row_index = -1
+            self.key = None
             print('执行删除操作')
 
-    def reset_data(self, key):
+    def reset_data(self):
         '''
         设置键的值
         '''
-        win = show_window.TTL(key, 'value')
-        win.exec_()
+        if (self.row_index == -1):
+            replay = QMessageBox.question(self, '提示', '请选择需设置的键', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        else:
+            win = show_window.TTL(self.key, 'value')
+            win.exec_()
+            self.row_index = -1
+            self.key = None
 
     def set_show_label(self):
         '''
@@ -281,6 +293,7 @@ class tab(QFrame):
         val_item = self.data_table.item(index, 1)
         self.key_text.setText(key_item.data(0))
         self.val_text.setPlainText(val_item.data(0))
+        self.key = key_item.data(0)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
