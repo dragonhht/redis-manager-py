@@ -43,7 +43,8 @@ class MyRedis:
         获取数据库数量
         '''
         r = self.get_redis()
-        return r.config_get('databases')
+        dbs = r.config_get('databases')
+        return int(dbs['databases']) 
 
     def get_db_keys(self):
         '''

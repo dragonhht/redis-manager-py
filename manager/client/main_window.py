@@ -11,6 +11,9 @@ from PyQt5.QtWidgets import QMainWindow, QTreeView, QTreeWidget, QWidget, QTabWi
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QCoreApplication
 import show_window
+from connect_model import ConnectModel
+from redis_manager import MyRedis
+from enum import Enum
 
 class ManagerWindow(QMainWindow):
 
@@ -65,7 +68,7 @@ class ManagerWindow(QMainWindow):
         layout.addWidget(self.tabs)
 
         self.setCentralWidget(widget)
-        self.tree.itemClicked.connect(self.test)
+        self.tree.itemClicked.connect(self.click_tree)
 
     def create_tab(self, tab_name):
         '''
@@ -86,14 +89,33 @@ class ManagerWindow(QMainWindow):
         '''
         root = QTreeWidgetItem(self.tree)
         root.setText(0, title)
-        for i in range(10):
-            item = QTreeWidgetItem(root)
-            item.setText(0, str(i))
-            
-            root.addChild(item)
+        connect_msg = ConnectModel()
+        root.setData(1, 0, ItemType.CONNECT)
+        root.setData(1, 1, connect_msg)
+    
+    def set_show_dbs(self, item, redis):
+        '''
+        显示连接的数据库
+        '''
+        db_count = redis.get_db_size()
+        for index in range(db_count):
+            db = QTreeWidgetItem(item)
+            db.setText(0, '数据库-' + str(index))
+            db.setData(1, 0, ItemType.DB)
+            db.setData(1, 1, index)
+            item.addChild(db)
 
-    def test(self, item, column):
-        print()
+    def click_tree(self, item, column):
+        '''
+        树的点击事件
+        '''
+        type = item.data(1, 0)
+        # 点击连接
+        if (type is ItemType.CONNECT):
+            if (item.childCount() < 1):
+                data = item.data(1, 1)
+                redis = MyRedis(data.get_host(), data.get_port(), data.get_password())
+                self.set_show_dbs(item, redis)
 
     def init_menubar(self):
         '''
@@ -146,6 +168,15 @@ class ManagerWindow(QMainWindow):
         qr.moveCenter(cp)
         # 将创建的窗口移动
         self.move(qr.topLeft())
+
+class ItemType(Enum):
+    '''
+    定义树item的所有类型
+    '''
+    CONNECT = 'connect'
+    DB = 'db'
+    KEY = 'key'
+
 
 class tab(QFrame):
     '''
