@@ -30,6 +30,8 @@ class ManagerWindow(QMainWindow):
         self.tree.setHeaderLabel('数据库')
         self.tree.setMaximumWidth(200)
 
+        self.tab_size = 0
+
         self.init_UI()
 
     def init_UI(self):
@@ -61,8 +63,6 @@ class ManagerWindow(QMainWindow):
         self.set_show_tree('连接-2')
         self.set_show_tree('连接-3')
         self.set_show_tree('连接-4')
-        for index in range(10):
-            self.create_tab('str' + str(index))
 
         layout.addWidget(self.tree)
         layout.addWidget(self.tabs)
@@ -70,11 +70,13 @@ class ManagerWindow(QMainWindow):
         self.setCentralWidget(widget)
         self.tree.itemClicked.connect(self.click_tree)
 
-    def create_tab(self, tab_name):
+    def create_tab(self, redis, dbs, key):
         '''
         创建标签页
         '''
-        self.tabs.addTab(tab(), tab_name)
+        tab_name = 'tab' + str(self.tab_size)
+        self.tab_size += 1
+        self.tabs.addTab(tab(redis, dbs, key), tab_name)
 
     def close_tab(self, index):
         '''
@@ -105,17 +107,42 @@ class ManagerWindow(QMainWindow):
             db.setData(1, 1, index)
             item.addChild(db)
 
+    def set_show_keys(self, item, redis):
+        '''
+        展示数据库的键
+        '''
+        db = item.data(1, 1)
+        item.takeChildren()
+        keys = redis.get_db_keys(db)
+        for key in keys:
+            k = QTreeWidgetItem(item)
+            k.setText(0, bytes.decode(key))
+            k.setData(1, 0, ItemType.KEY)
+            k.setData(1, 1, bytes.decode(key))
+            item.addChild(k)
+
     def click_tree(self, item, column):
         '''
         树的点击事件
         '''
-        type = item.data(1, 0)
+        type = item.data(1, 0) 
         # 点击连接
         if (type is ItemType.CONNECT):
             if (item.childCount() < 1):
                 data = item.data(1, 1)
                 redis = MyRedis(data.get_host(), data.get_port(), data.get_password())
+                item.setData(1, 2, redis)
                 self.set_show_dbs(item, redis)
+        # 点击数据库
+        if (type is ItemType.DB):
+            redis = item.parent().data(1, 2)
+            self.set_show_keys(item, redis)
+        # 点击键
+        if (type is ItemType.KEY):
+            redis = item.parent().parent().data(1, 2)
+            db = item.parent().data(1, 1)
+            key = item.data(1, 1)
+            self.create_tab(redis, db, key)
 
     def init_menubar(self):
         '''
@@ -183,7 +210,7 @@ class tab(QFrame):
     详细数据展示面板
     '''
 
-    def __init__(self):
+    def __init__(self, redis, db, key):
         super().__init__()
         # 设置字号
         self.setFont(QFont('SansSerif', 10))
@@ -196,7 +223,9 @@ class tab(QFrame):
         self.data_table = None
         # 选择的列表行索引
         self.row_index = -1
-        self.key = None
+        self.key = key
+        self.redis = redis
+        self.db = db
 
         self.init_UI()
 

@@ -44,13 +44,13 @@ class MyRedis:
         '''
         r = self.get_redis()
         dbs = r.config_get('databases')
-        return int(dbs['databases']) 
+        return int(dbs['databases'])
 
-    def get_db_keys(self):
+    def get_db_keys(self, db):
         '''
         获取数据库的所有键
         '''
-        r = self.get_redis()
+        r = self.get_redis(db=db)
         return r.keys('*')
 
 
@@ -73,4 +73,4 @@ class redisUtli:
 
 if __name__ == '__main__':
     my_redis = MyRedis()
-    print(my_redis.get_db_keys())
+    print(my_redis.get_db_keys(12))
