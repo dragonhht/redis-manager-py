@@ -12,11 +12,13 @@ from PyQt5.QtGui import QFont
 
 class TTL(QDialog):
 
-    def __init__(self, key, title):
+    def __init__(self, key, title, redis):
         super().__init__()
         self.key = key
         self.title = title
         self.setFixedSize(400, 130)
+        self.val_input = QLineEdit()
+        self.redis = redis
         self.init_UI()
         
     def init_UI(self):
@@ -38,12 +40,12 @@ class TTL(QDialog):
 
         input_hbox = QHBoxLayout()
         label = QLabel(self.title + ': ')
-        val_input = QLineEdit()
-        val_input.setFixedWidth(200)
-        val_input.setFixedHeight(25)
+        
+        self.val_input.setFixedWidth(200)
+        self.val_input.setFixedHeight(25)
         input_hbox.addStretch(1)
         input_hbox.addWidget(label)
-        input_hbox.addWidget(val_input)
+        input_hbox.addWidget(self.val_input)
         input_hbox.addStretch(1)
 
         hbox = QHBoxLayout()
@@ -70,10 +72,21 @@ class TTL(QDialog):
         '''
         print(self.title)
         if (self.title == 'TTL'):
-            print('正在设置TTL')
+            self.set_ttl()
         if (self.title == 'value'):
             print('正在设置Value')
         self.close()
+
+    def set_ttl(self):
+        '''
+        设置TTL
+        '''
+        val = self.val_input.text()
+        try:
+            val = int(val)
+            self.redis.set_key_ttl(self.key, val)
+        except ValueError as err:
+            print('please input int')
 
     def center(self):
         '''
@@ -87,17 +100,3 @@ class TTL(QDialog):
         qr.moveCenter(cp)
         # 将创建的窗口移动
         self.move(qr.topLeft())
-
-def show_TTL_win(key):
-    '''
-    显示TTL设置窗体
-    '''
-    app = QApplication(sys.argv)
-    win = TTL(key, 'test')
-    sys.exit(app.exec_())
-
-def main():
-    show_TTL_win('test')
- 
-if __name__ == '__main__':
-     main()

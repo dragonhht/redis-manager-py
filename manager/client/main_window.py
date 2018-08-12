@@ -259,7 +259,7 @@ class tab(QFrame):
         '''
         设置TTL按钮的点击事件
         '''
-        win = show_window.TTL(self.key, 'TTL')
+        win = show_window.TTL(self.key, 'TTL', self.redis)
         win.exec_()
 
     def reload_data(self):
@@ -281,7 +281,6 @@ class tab(QFrame):
             # TODO 执行删除
             self.data_table.removeRow(self.row_index)
             self.row_index = -1
-            self.key = None
             print('执行删除操作')
 
     def reset_data(self):
@@ -291,20 +290,21 @@ class tab(QFrame):
         if (self.row_index == -1):
             replay = QMessageBox.question(self, '提示', '请选择需设置的键', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         else:
-            win = show_window.TTL(self.key, 'value')
+            win = show_window.TTL(self.key, 'value', self.redis)
             win.exec_()
             self.row_index = -1
-            self.key = None
 
     def set_show_label(self):
         '''
         设置展示的label
         '''
+        key_type = self.redis.get_key_type(self.key)
+        key_ttl = str(self.redis.get_key_ttl(self.key))
         # 使用绝对定位添加label
         QLabel('type： ', self).move(5, 10)
-        QLabel('String', self).move(40, 10)
+        QLabel(key_type, self).move(40, 10)
         QLabel('TTL : ',self).move(100, 10)
-        QLabel('-1', self).move(140, 10)
+        QLabel(key_ttl, self).move(140, 10)
         QLabel('key： ', self).move(5, 500)
         QLabel('value: ', self).move(5, 540)
 

@@ -53,6 +53,34 @@ class MyRedis:
         r = self.get_redis(db=db)
         return r.keys('*')
 
+    def get_key_type(self, key):
+        '''
+        获取键的类型
+        '''
+        r = self.get_redis()
+        return bytes.decode(r.type(key))
+
+    def get_key_ttl(self, key):
+        '''
+        获取ttl
+        '''
+        r = self.get_redis()
+        ttl = r.ttl(key)
+        if (ttl):
+            return ttl
+        else:
+            return -1
+
+    def set_key_ttl(self, key, ttl):
+        '''
+        设置ttl
+        '''
+        r = self.get_redis()
+        if (ttl == -1):
+            r.persist(key)
+        else:
+            r.expire(key, ttl)
+
 
 def singleton(cls, *args, **kw):
     instances = {}
@@ -73,4 +101,4 @@ class redisUtli:
 
 if __name__ == '__main__':
     my_redis = MyRedis()
-    print(my_redis.get_db_keys(12))
+    print(my_redis.get_key_ttl('test'))
